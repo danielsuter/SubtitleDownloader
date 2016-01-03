@@ -21,25 +21,34 @@ public class OSDownloader {
 
 	private final OpenSubtitles server;
 	
-	private MovieFileFinder fileFinder = new MovieFileFinder();
 	private SubtitleDownloader downloader;
 	
-	public static OSDownloader connect() throws MalformedURLException, XmlRpcException {
-		return new OSDownloader(login());
+	public static OSDownloader connect(String user, String password) throws MalformedURLException, XmlRpcException {
+		return new OSDownloader(login(user, password));
 	}
 	
 	public static void main(String[] args) throws Exception {
-//		OSDownloader.connect().download(new File("\\\\DiskStation\\video\\TV show\\The Man In The High Castle Season 1 Mp4 1080p"), true);
-		OSDownloader.connect().download(new File("\\\\DiskStation\\video\\TV show\\South Park\\South Park Season 8"), true);
+		if(args.length != 1) {
+			printUsage();
+		} else {
+			Settings settings = SettingsFactory.parse(new File(args[0]));
+			OSDownloader osDownloader = OSDownloader.connect(settings.getUser(), settings.getPassword());
+			osDownloader.download(settings.getPath(), settings.isReplaceExisting(), settings.getTimestamp(), settings.getExcludes());
+		}
 	}
 	
-	
+	private static void printUsage() {
+		System.out.println("Provide path to settings.properties");
+	}
+
 	private OSDownloader(OpenSubtitles server) {
 		this.server = server;
 		this.downloader = new SubtitleDownloader(server);
 	}
 	
-	public void download(File baseDirectory, boolean replace) {
+	public void download(File baseDirectory, boolean replace, Long timestamp, Set<String> excludes) {
+		MovieFileFinder fileFinder = new MovieFileFinder(timestamp, replace, excludes);
+		
 		Set<File> movieFiles = fileFinder.findAll(baseDirectory);
 		System.out.println(String.format("Found %d movies", movieFiles.size()));
 		for (File movieFile : movieFiles) {
@@ -80,10 +89,10 @@ public class OSDownloader {
 		}
 	}
 
-	private static OpenSubtitles login() throws MalformedURLException, XmlRpcException {
+	private static OpenSubtitles login(String user, String password) throws MalformedURLException, XmlRpcException {
 		URL serverUrl = new URL(SERVER_URL);
 		OpenSubtitlesImpl server = new OpenSubtitlesImpl(serverUrl);
-		server.login("en", USER_AGENT);
+		server.login(user, password, "en", USER_AGENT);
 		return server;
 	}
 }
