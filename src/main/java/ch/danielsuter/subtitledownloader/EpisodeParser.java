@@ -4,10 +4,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class EpisodeParser {
-	public static void main(String[] args) {
-		System.out.println(parseEpisode("The Man In The High Castle S01E01"));
-	}
-	
 	public static Episode parseEpisode(String fileName) {
 		Pattern pattern = Pattern.compile("(.*)S(\\d+)E(\\d+).*");
 		Matcher matcher = pattern.matcher(fileName);

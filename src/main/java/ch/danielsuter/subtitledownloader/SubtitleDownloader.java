@@ -6,21 +6,24 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.xmlrpc.XmlRpcException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.github.wtekiela.opensub4j.api.OpenSubtitles;
 import com.github.wtekiela.opensub4j.response.SubtitleFile;
 import com.github.wtekiela.opensub4j.response.SubtitleInfo;
 
 public class SubtitleDownloader {
-	private OpenSubtitles server;
+	private final static Logger logger = LoggerFactory.getLogger(SubtitleDownloader.class);
 
+	private OpenSubtitles server;
+	
 	public SubtitleDownloader(OpenSubtitles server) {
 		this.server = server;
 	}
 	
 	public boolean download(File movie, SubtitleInfo subtitleInfo, boolean replace) {
-		System.out.println(" Downloading subtitle: " + subtitleInfo);
-		
+		logger.info(" Downloading subtitle: {}", subtitleInfo.getDownloadLink());
 		try {
 			List<SubtitleFile> subtitles = server.downloadSubtitles(subtitleInfo.getSubtitleFileId());
 			

@@ -11,7 +11,8 @@ repositories {
 }
 
 dependencies {
-	compile 'com.github.wtekiela:opensub4j:0.1.2'
+	compile ('ch.qos.logback:logback-classic:1.1.3')
+	compile ('com.github.wtekiela:opensub4j:0.1.2')
 	
     testCompile 'junit:junit:4.12'
 }
@@ -20,6 +21,10 @@ jar {
     manifest {
         attributes 'Main-Class': 'ch.danielsuter.subtitledownloader.OSDownloader'
     }
+    
+  from {
+    configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+  }    
 }
 
 

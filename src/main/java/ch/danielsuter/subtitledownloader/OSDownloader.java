@@ -8,12 +8,15 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.xmlrpc.XmlRpcException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.github.wtekiela.opensub4j.api.OpenSubtitles;
 import com.github.wtekiela.opensub4j.impl.OpenSubtitlesImpl;
 import com.github.wtekiela.opensub4j.response.SubtitleInfo;
 
 public class OSDownloader {
+	private final static Logger logger = LoggerFactory.getLogger(OSDownloader.class);
 	
 	private static final String USER_AGENT = "OSTestUserAgent";
 	private static final String SERVER_URL = "http://api.opensubtitles.org/xml-rpc";
@@ -50,22 +53,22 @@ public class OSDownloader {
 		MovieFileFinder fileFinder = new MovieFileFinder(timestamp, replace, excludes);
 		
 		Set<File> movieFiles = fileFinder.findAll(baseDirectory);
-		System.out.println(String.format("Found %d movies", movieFiles.size()));
+		logger.info("Found {} movies", movieFiles.size());
 		for (File movieFile : movieFiles) {
-			System.out.println(String.format("Processing %s ...", movieFile.getName()));
+			logger.debug("Processing {} ...", movieFile.getName());
 			List<SubtitleInfo> subtitles = searchByFile(movieFile);
 			if(subtitles.isEmpty()) {
-				System.out.println(" Could not find any subtitles by file hash. Using fulltext search...");
+				logger.debug(" Could not find any subtitles by file hash. Using fulltext search...");
 				subtitles = searchByFullName(movieFile);
 			}
 			
 			if(subtitles.isEmpty()) {
-				System.out.println(" Could not find any subtitles for: " + movieFile.getName());
+				logger.info(" Could not find any subtitles for: {}", movieFile.getName());
 			} else {
 				int subtitleIndex = 0;
 				boolean successfullyDownloaded = downloader.download(movieFile, subtitles.get(subtitleIndex++), replace);
 				while(subtitleIndex < subtitles.size() && !successfullyDownloaded) {
-					System.out.println(" Download failed - trying another subtitle");
+					logger.warn(" Download failed - trying another subtitle");
 					successfullyDownloaded = downloader.download(movieFile, subtitles.get(subtitleIndex++), replace);
 				}
 			}
