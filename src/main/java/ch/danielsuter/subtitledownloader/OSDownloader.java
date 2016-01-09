@@ -4,9 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.xmlrpc.XmlRpcException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,6 +68,8 @@ public class OSDownloader {
 			if(subtitles.isEmpty()) {
 				logger.info(" Could not find any subtitles for: {}", movieFile.getName());
 			} else {
+				sortByRelevance(movieFile, subtitles);
+				
 				int subtitleIndex = 0;
 				boolean successfullyDownloaded = downloader.download(movieFile, subtitles.get(subtitleIndex++), replace);
 				while(subtitleIndex < subtitles.size() && !successfullyDownloaded) {
@@ -75,6 +80,28 @@ public class OSDownloader {
 		}
 	}
 	
+	private void sortByRelevance(File movie, List<SubtitleInfo> subtitles) {
+		Collections.sort(subtitles, new Comparator<SubtitleInfo>() {
+
+			@Override
+			public int compare(SubtitleInfo subtitleInfo1, SubtitleInfo subtitleInfo2) {
+				String movieName = FileUtil.getFileWithoutExtension(movie);
+				String filename1 = FileUtil.getFileWithoutExtension(subtitleInfo1.getFileName());
+				String filename2 = FileUtil.getFileWithoutExtension(subtitleInfo2.getFileName());
+				
+				int distance1 = StringUtils.getLevenshteinDistance(movieName, filename1);
+				int distance2 = StringUtils.getLevenshteinDistance(movieName, filename2);
+				
+				return Integer.compare(distance1, distance2);
+			}
+		});
+		
+		logger.debug("Relevance for {} is now", movie.getName());
+		for (SubtitleInfo subtitleInfo : subtitles) {
+			logger.debug(" {}", subtitleInfo.getFileName());
+		}
+	}
+
 	private List<SubtitleInfo> searchByFile(File movie) {
 		try {
 			return server.searchSubtitles(SEARCH_LANGUAGE, movie);

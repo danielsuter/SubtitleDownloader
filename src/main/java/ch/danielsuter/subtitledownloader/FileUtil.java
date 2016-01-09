@@ -4,8 +4,11 @@ import java.io.File;
 
 public class FileUtil {
 	public static String getFileWithoutExtension(File file) {
-		String name = file.getName();
-		int lastDot = name.lastIndexOf(".");
-		return name.substring(0, lastDot);
+		return getFileWithoutExtension(file.getName());
+	}
+	
+	public static String getFileWithoutExtension(String fileName) {
+		int lastDot = fileName.lastIndexOf(".");
+		return fileName.substring(0, lastDot);
 	}
 }
