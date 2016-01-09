@@ -23,7 +23,7 @@ public class SubtitleDownloader {
 	}
 	
 	public boolean download(File movie, SubtitleInfo subtitleInfo, boolean replace) {
-		logger.info(" Downloading subtitle: {}", subtitleInfo.getDownloadLink());
+		logger.info(" Downloading subtitle with name '{}' : {}",  subtitleInfo.getFileName() ,subtitleInfo.getDownloadLink());
 		try {
 			List<SubtitleFile> subtitles = server.downloadSubtitles(subtitleInfo.getSubtitleFileId());
 			
