@@ -21,10 +21,10 @@ public class MovieFileFinder {
 	public MovieFileFinder() {
 	}
 
-	public MovieFileFinder(Long filesNewerThanTimestamp, boolean filterExisting, Set<String> excludes) {
+	public MovieFileFinder(Long filesNewerThanTimestamp, boolean replaceExisting, Set<String> excludes) {
 		this.filesNewerThanTimestamp = filesNewerThanTimestamp;
 		this.excludes = excludes;
-		this.filterExisting = filterExisting;
+		this.filterExisting = !replaceExisting;
 	}
 
 	public Set<File> findAll(File basePath) {
