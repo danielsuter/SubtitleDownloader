@@ -81,6 +81,7 @@ public class OSDownloader {
 	}
 	
 	private void sortByRelevance(File movie, List<SubtitleInfo> subtitles) {
+		logger.debug("Sorting relevance for movie {}", movie.getName());
 		Collections.sort(subtitles, new Comparator<SubtitleInfo>() {
 
 			@Override
@@ -88,7 +89,7 @@ public class OSDownloader {
 				String movieName = FileUtil.getFileWithoutExtension(movie);
 				String filename1 = FileUtil.getFileWithoutExtension(subtitleInfo1.getFileName());
 				String filename2 = FileUtil.getFileWithoutExtension(subtitleInfo2.getFileName());
-				
+
 				int distance1 = StringUtils.getLevenshteinDistance(movieName, filename1);
 				int distance2 = StringUtils.getLevenshteinDistance(movieName, filename2);
 				
